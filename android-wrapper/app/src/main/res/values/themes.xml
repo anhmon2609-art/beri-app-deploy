@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ViecNhaCuaBe" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#FF6B35</item>
+        <item name="android:statusBarColor">#FF6B35</item>
+        <item name="android:navigationBarColor">#FFF8F0</item>
+        <item name="android:windowBackground">#FFF8F0</item>
+    </style>
+</resources>

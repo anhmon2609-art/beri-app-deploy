@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'vn.viecnhacuabe.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "vn.viecnhacuabe.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 2
+        versionName "1.1.0"
+        buildConfigField "String", "APP_URL", "\"https://viec-nha-cua-be.onrender.com\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.webkit:webkit:1.10.0'
+    implementation 'com.google.android.material:material:1.11.0'
+}

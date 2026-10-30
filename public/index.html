@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#FF6B35" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Việc Nhà Của Bé" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="icon" type="image/svg+xml" href="/icons/beri-coin.svg" />
+  <title>Việc Nhà Của Bé</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Onboarding -->
+    <section id="view-welcome" class="view active">
+      <div class="welcome-hero">
+        <div class="coin-lg" aria-hidden="true"></div>
+        <h1>Việc Nhà Của Bé</h1>
+        <p class="sub">Làm việc nhà · nhận thưởng · mua giờ chơi<br/>Phụ huynh &amp; con dùng chung một mã gia đình</p>
+      </div>
+      <div class="card stack">
+        <button class="btn primary" id="btn-goto-create">Tôi là Phụ huynh — Tạo gia đình</button>
+        <button class="btn secondary" id="btn-goto-join">Tôi là Con — Nhập mã gia đình</button>
+      </div>
+      <p class="hint soft">Cài app: trên điện thoại mở trang này → Thêm vào Màn hình chính</p>
+    </section>
+
+    <section id="view-create" class="view">
+      <button class="back" data-back="welcome">← Quay lại</button>
+      <h2>Tạo gia đình</h2>
+      <label>Tên phụ huynh
+        <input id="create-parent-name" placeholder="VD: Mẹ Phương" maxlength="40" />
+      </label>
+      <label>Tên gia đình
+        <input id="create-family-name" placeholder="VD: Nhà mình" maxlength="40" />
+      </label>
+      <button class="btn primary" id="btn-create">Tạo &amp; nhận mã</button>
+      <p id="create-error" class="error" hidden></p>
+    </section>
+
+    <section id="view-join" class="view">
+      <button class="back" data-back="welcome">← Quay lại</button>
+      <h2>Tham gia gia đình</h2>
+      <label>Mã gia đình (6 ký tự)
+        <input id="join-code" placeholder="VD: ABC123" maxlength="6" class="code-input" autocomplete="off" />
+      </label>
+      <label>Tên của con
+        <input id="join-child-name" placeholder="VD: Bé Na" maxlength="40" />
+      </label>
+      <button class="btn primary" id="btn-join">Tham gia</button>
+      <p id="join-error" class="error" hidden></p>
+    </section>
+
+    <!-- Main app shell -->
+    <section id="view-home" class="view">
+      <header class="topbar">
+        <div>
+          <div class="role-pill" id="role-pill">—</div>
+          <div class="who" id="who-name">—</div>
+        </div>
+        <div class="family-code-box" id="family-code-box" title="Mã gia đình">
+          <span class="label">Mã</span>
+          <strong id="family-code">————</strong>
+        </div>
+      </header>
+
+      <div class="wallet-card">
+        <div class="wallet-row">
+          <span class="wallet-label" id="wallet-label">Ví của bạn</span>
+          <div class="balance" id="balance">
+            <span class="coin-sm" aria-hidden="true"></span>
+            <span id="balance-num">0</span>
+          </div>
+        </div>
+        <div class="wallet-meta" id="wallet-meta"></div>
+      </div>
+
+      <div id="session-banner" class="session-banner" hidden>
+        <div class="session-title" id="session-title">Đang dùng</div>
+        <div class="session-countdown" id="session-countdown">00:00</div>
+        <div class="session-sub" id="session-sub"></div>
+      </div>
+
+      <nav class="tabs" id="main-tabs">
+        <button class="tab active" data-tab="tab-home">Trang chủ</button>
+        <button class="tab" data-tab="tab-tasks">Việc nhà</button>
+        <button class="tab" data-tab="tab-time">Giờ chơi</button>
+        <button class="tab" data-tab="tab-more">Thêm</button>
+      </nav>
+
+      <div class="tab-panels">
+        <div id="tab-home" class="tab-panel active">
+          <div id="pending-box" class="card" hidden>
+            <h3>Chờ duyệt</h3>
+            <div id="pending-list" class="list"></div>
+          </div>
+          <div class="card">
+            <h3>Chuyển tiền</h3>
+            <div class="row gap">
+              <select id="transfer-dir">
+                <option value="parent_to_child">Phụ huynh → Con</option>
+                <option value="child_to_parent">Con → Phụ huynh</option>
+              </select>
+            </div>
+            <div class="row gap">
+              <input id="transfer-amount" type="number" inputmode="numeric" placeholder="Số tiền" min="1" />
+              <button class="btn primary sm" id="btn-transfer">Chuyển</button>
+            </div>
+            <p id="transfer-msg" class="hint" hidden></p>
+          </div>
+          <div class="card">
+            <div class="row between">
+              <h3>Lịch sử gần đây</h3>
+              <button class="link" id="btn-open-history">Xem tất cả</button>
+            </div>
+            <div id="home-history" class="list compact"></div>
+          </div>
+        </div>
+
+        <div id="tab-tasks" class="tab-panel">
+          <div class="card" id="rewards-card">
+            <div class="row between">
+              <h3>Thưởng khi làm xong</h3>
+              <button class="link" id="btn-edit-rewards" hidden>Sửa</button>
+            </div>
+            <div id="rewards-list" class="list"></div>
+          </div>
+          <div class="card" id="penalties-card" hidden>
+            <h3>Phạt (chỉ phụ huynh)</h3>
+            <div id="penalties-list" class="list"></div>
+            <div class="divider"></div>
+            <h4>Phạt nặng (tự nhập)</h4>
+            <input id="custom-penalty-title" placeholder="Lý do phạt nặng" maxlength="60" />
+            <div class="row gap">
+              <input id="custom-penalty-amount" type="number" inputmode="numeric" placeholder="Số trừ" min="1" />
+              <button class="btn danger sm" id="btn-custom-penalty">Phạt</button>
+            </div>
+            <input id="penalty-note" placeholder="Ghi chú (tuỳ chọn)" maxlength="120" />
+          </div>
+        </div>
+
+        <div id="tab-time" class="tab-panel">
+          <div class="card">
+            <h3>Mua giờ chơi</h3>
+            <p class="hint">Điện thoại/iPad hoặc Tivi: <span class="coin-inline"></span> 25.000 / giờ</p>
+            <p class="hint" id="daily-max-hint">Giới hạn ngày: 2 giờ</p>
+            <div class="kind-pick">
+              <button class="chip active" data-kind="phone">📱 Điện thoại / iPad</button>
+              <button class="chip" data-kind="tv">📺 Tivi</button>
+            </div>
+            <div class="mins-pick">
+              <button class="chip time" data-mins="15">15 phút · <span class="coin-inline"></span> 6.250</button>
+              <button class="chip time" data-mins="30">30 phút · <span class="coin-inline"></span> 12.500</button>
+              <button class="chip time" data-mins="60">60 phút · <span class="coin-inline"></span> 25.000</button>
+            </div>
+            <button class="btn primary" id="btn-buy-time" hidden>Mua &amp; bắt đầu</button>
+            <p id="time-msg" class="hint" hidden></p>
+          </div>
+          <div class="card" id="daily-max-card" hidden>
+            <h3>Giới hạn ngày (phụ huynh)</h3>
+            <div class="row gap">
+              <input id="daily-max-input" type="number" inputmode="numeric" min="15" max="480" step="15" value="120" />
+              <span class="hint">phút</span>
+              <button class="btn secondary sm" id="btn-save-daily-max">Lưu</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-more" class="tab-panel">
+          <div class="card">
+            <h3>Gia đình</h3>
+            <p>Mã gia đình: <strong id="more-code">—</strong>
+              <button class="link" id="btn-copy-code">Sao chép</button>
+            </p>
+            <div id="members-list" class="list compact"></div>
+            <label>Đổi tên hiển thị
+              <div class="row gap">
+                <input id="rename-input" maxlength="40" />
+                <button class="btn secondary sm" id="btn-rename">Lưu</button>
+              </div>
+            </label>
+          </div>
+          <div class="card">
+            <h3>Thông báo</h3>
+            <button class="btn secondary" id="btn-enable-notif">Bật thông báo &amp; âm báo</button>
+            <p class="hint">Cần cho báo hết giờ trên điện thoại. iPhone: thêm vào Màn hình chính rồi bật thông báo.</p>
+          </div>
+          <div class="card">
+            <button class="btn danger outline" id="btn-logout">Đăng xuất thiết bị này</button>
+          </div>
+          <p class="hint soft center">v1 · tiền giả trong nhà · không liên kết ngân hàng</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- History overlay -->
+    <section id="view-history" class="view overlay">
+      <button class="back" id="btn-close-history">← Đóng</button>
+      <h2>Lịch sử</h2>
+      <div class="filters">
+        <button class="chip filter active" data-filter="all">Tất cả</button>
+        <button class="chip filter" data-filter="earn">Thưởng</button>
+        <button class="chip filter" data-filter="penalty">Phạt</button>
+        <button class="chip filter" data-filter="transfer">Chuyển</button>
+        <button class="chip filter" data-filter="purchase">Mua giờ</button>
+        <button class="chip filter" data-filter="bonus">Tuần</button>
+      </div>
+      <div id="full-history" class="list"></div>
+    </section>
+
+    <!-- Edit rewards overlay -->
+    <section id="view-edit-rewards" class="view overlay">
+      <button class="back" id="btn-close-edit-rewards">← Đóng</button>
+      <h2>Sửa danh sách thưởng</h2>
+      <div id="edit-rewards-list" class="edit-list"></div>
+      <button class="btn secondary" id="btn-add-reward">+ Thêm việc</button>
+      <button class="btn primary" id="btn-save-rewards">Lưu</button>
+    </section>
+
+    <div id="toast" class="toast" hidden></div>
+    <audio id="alarm-audio" preload="auto"></audio>
+  </div>
+  <script src="/js/app.js"></script>
+</body>
+</html>
